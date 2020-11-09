@@ -4,8 +4,8 @@
 Request
 ```json
 {
-    "comment-creator": "<user-id>"
-    "post-identifier": "<post-id>"
+    "comment-creator": "<user-id>",
+    "post-identifier": "<post-id>",
     "comment-content": "<content>"
 }
 ```
@@ -13,7 +13,7 @@ Request
 Response
 ```json
 {
-    "confirm-create": "<Boolean>"
+    "confirm-create": "<Boolean>",
     "commentID": "<comment-id>"
 }
 ```
@@ -22,7 +22,7 @@ Response
 Request
 ```json
 {
-    "comment-identifier": "<comment-id>"
+    "comment-identifier": "<comment-id>",
     "new-content": "<content>"
 }
 ```
@@ -30,7 +30,7 @@ Request
 Response
 ```json
 {
-    "confirm-update": "<Boolean>"
+    "confirm-update": "<Boolean>",
     "commentID": "<comment-id>"
 }
 ```
