@@ -23,6 +23,7 @@ Response
 Request
 ```json
 {
+    "comment-updater": "<user-id>",
     "comment-identifier": "<comment-id>",
     "new-content": "<content>"
 }
@@ -41,6 +42,7 @@ Response
 Request
 ```json
 {
+    "comment-updater": "<user-id>",
     "comment-identifier": "<comment-id>"
 }
 ```
