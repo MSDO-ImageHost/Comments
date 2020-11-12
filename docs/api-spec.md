@@ -14,7 +14,7 @@ Response
 ```json
 {
     "confirm-create": "<Boolean>",
-    "commentID": "<comment-id>"
+    "commentID": "<comment-id>",
     "comment-timestamp": "<ISO8601 timestamp>",
 }
 ```
