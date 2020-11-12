@@ -15,6 +15,7 @@ Response
 {
     "confirm-create": "<Boolean>",
     "commentID": "<comment-id>"
+    "comment-timestamp": "<ISO8601 timestamp>",
 }
 ```
 
@@ -31,7 +32,8 @@ Response
 ```json
 {
     "confirm-update": "<Boolean>",
-    "commentID": "<comment-id>"
+    "commentID": "<comment-id>",
+    "update-timestamp": "<ISO8601 timestamp>",
 }
 ```
 
@@ -61,7 +63,8 @@ Request
 Response
 ```json
 {
-    "comment-content": "<content>"
+    "comment-content": "<content>",
+    "comment-id": "<commend-id>"
 }
 ```
 
