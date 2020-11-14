@@ -5,7 +5,7 @@ Request
 ```json
 {
     "comment-creator": "<user-id>",
-    "post-identifier": "<post-id>",
+    "post-id": "<post-id>",
     "comment-content": "<content>"
 }
 ```
@@ -13,13 +13,15 @@ Request
 Response
 ```json
 {
-    "confirm-create": "<Boolean>",
     "commentID": "<comment-id>",
-    "comment-timestamp": "<ISO8601 timestamp>",
+    "confirm-create": "<Boolean>",
+    "comment-timestamp": "<ISO8601 timestamp>"
 }
 ```
 
 ## UpdateComment
+At this time, updating comments will simply replace the current content of a comment within the DB with some new content.
+
 Request
 ```json
 {
@@ -42,7 +44,7 @@ Response
 Request
 ```json
 {
-    "comment-updater": "<user-id>",
+    "comment-deletor": "<user-id>",
     "comment-identifier": "<comment-id>"
 }
 ```
@@ -65,8 +67,10 @@ Request
 Response
 ```json
 {
-    "comment-content": "<content>",
-    "comment-id": "<commend-id>"
+    "comment-id": "<commend-id>",
+    "post-id": "<post-id>",
+    "created-at": "<ISO8601 timestamp>",
+    "comment-content": "<content>"
 }
 ```
 
