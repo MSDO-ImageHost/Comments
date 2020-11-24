@@ -1,0 +1,59 @@
+version: '3.7'
+
+
+volumes:
+  db-storage:
+  rabbitmq-data:
+
+
+services:
+  vscode:
+    build:
+      context: ..
+      dockerfile: Dockerfile.dev
+      args:
+        # [Choice] Python version: 3, 3.8, 3.7, 3.6
+        VARIANT: 3
+        USER_UID: 1000
+        USER_GID: 1000
+    volumes:
+      - ..:/workspace:cached
+      #- ..:/workspace
+      - ~/.ssh:/home/vscode/.ssh
+      - ~/.ssh:/root/.ssh
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - TZ=Europe/Copenhagen
+      - DATABASE_CONN_URI=postgres@database:5432/postgress
+      - RABBITMQ_CONN_URI=amqp://guest:guest@rabbitmq:5672/
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - seccomp:unconfined
+    command: sleep infinity
+    restart: unless-stopped
+
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    ports:
+      - 15672:15672
+    environment:
+      - RABBITMQ_USERNAME=guest
+      - RABBITMQ_PASSWORD=guest
+    restart: unless-stopped
+  
+  
+  database:
+    image: postgres:latest
+    container_name: postgress
+    volumes:
+      - db-storage:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+      POSTGRES_PASSWORD: postgres
+    restart: unless-stopped
+
