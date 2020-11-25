@@ -3,6 +3,7 @@
 #from sqlalchemy.orm import sessionmaker, relationship
 from datetime import datetime
 from models import Base, Comment
+import json
 #from config import DATABASE_CONNECTION_URI
 
 '''
@@ -17,20 +18,28 @@ Session = sessionmaker(bind=engine)
 
 session = Session()'''
 
-#Virker
+'''
+For testing. Given a session, returns all objects for that session.
+'''
 def get_all_comments(session):
     #session = Session()
     comments = session.query(Comment).all()
     return comments
 
-#virker
-def request_comment(session, uId):
-    #session = Session()
-    #comment = session.filter_by(id=id).first()
-    comment = session.query(Comment).get(uId)
-    return comment
+'''
+@Input - A session, and comment Id(cId)
+@Output - Json object containing the comment's id, post id, 
+ISO8601 timestamp(when it was created), and the content.
+'''
+def request_comment(session, cId):
+    comment = session.query(Comment).get(cId)
+    return json.dumps({'comment-id': comment.id, 'post-id': comment.postId, 'created-at': comment.postedAt, 'content': comment.content}, indent=2, default=str)
   
-#Virker
+'''
+@Input - A session, authorId, postId, content
+@Output - The created comment's id, ISO8601 timestamp for when it was created, 
+and http response code.
+'''
 def create_comment(session, authorId, postId, content):
     #session = Session()
     comment = Comment()
@@ -40,27 +49,52 @@ def create_comment(session, authorId, postId, content):
     comment.content = content
     session.add(comment)
     session.commit()
-    session.refresh(comment)
-    return True
-    # comment.id kan bruges til at returne actual id
-    # returns commentId, postId, comment-content
+    session.refresh(comment) # Needs this to refer to comment.id
+    return json.dumps({'comment-id': comment.id, 'http-response': 200, 'created-at': comment.postedAt}, indent=2, default=str)
     
-def update_comment(session, uId, newContent):
-    comment = session.query(Comment).get(uId)
-    comment.content = newContent
-    session.commit()
+'''
+@Input - A session, id of the comment user wants to change,
+id of the author/user wanting to make a change,
+and the new content.
+@Return - id of the comment being changed, http response code, 
+ISO8601 timestamp representing when it was modified.
+'''
+def update_comment(session, cId, aId, newContent):
+    comment = session.query(Comment).get(cId)
+    if(aId == comment.authorId):
+        comment.content = newContent
+        comment.postedAt = datetime.now().isoformat()
+        session.commit()
+        return json.dumps({'confirm-delete': 200, 'comment-id': comment.id, 'update-timestamp': comment.postedAt}, indent=2, default=str)
+    else:
+        return json.dumps({'confirm-delete': 403, 'comment-id': comment.id, 'update-timestamp': comment.postedAt}, indent=2, default=str)
         
-def delete_comment(session, uId):
+'''
+@Input - A session, id of the user/author wanting to delete comment,
+and the id of the comment
+@Output - Http response code
+'''
+def delete_comment(session, aId, cId):
     #apparently it has to be done in two steps. Can't just call .delete()
-    comment = session.query(Comment).get(uId)
-    session.delete(comment)
-    session.commit()
-    return True
+    comment = session.query(Comment).get(cId)
+    if(aId == comment.authorId):
+        session.delete(comment)
+        session.commit()
+        return json.dumps({'confirm-delete': 200}, indent=2, default=str)
+    else:
+        return json.dumps({'confirm-delete': 403}, indent=2, default=str)
+
     
+'''
+@Input - A session, and the id of a post
+@Output - A list of comment id's which is connected to that post.
+'''
 def request_comments_for_post(session, pId):
-    #session = Session()
     comments = session.query(Comment).filter(Comment.postId==pId).all()
-    return comments
+    commentIdArray = []
+    for comment in comments:
+        commentIdArray.append(comment.id)
+    return json.dumps({'list-of-comment-ids': commentIdArray}, indent=2, default=str)
     
 
 
