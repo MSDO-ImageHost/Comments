@@ -14,7 +14,7 @@ Response
 ```json
 {
     "commentID": "<comment-id>",
-    "confirm-create": "<Boolean>",
+    "confirm-create": "HTTP response",
     "comment-timestamp": "<ISO8601 timestamp>"
 }
 ```
@@ -52,7 +52,7 @@ Request
 Response
 ```json
 {
-    "confirm-delete": "<Boolean>"
+    "confirm-delete": "<HTTP response code>"
 }
 ```
 
