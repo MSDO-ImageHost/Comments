@@ -17,23 +17,25 @@ session = Session() #Start a session with the engine
 
 events = ['CreateComment', 'UpdateComment', 'DeleteComment', 'RequestComment', 'RequestCommentsForPost']
 
+'''
+@Input: Event string, json data(dict)
+@Output: None, puts object onto rapid
+'''
 def send(event, data):
     channel.basic_publish(exchange='rapid', routing_key=event, body=data)
 
 '''
-@Input: event, json data(dict)
-@Output: Nothing, sends a json object onto rapid
+@Input: event string, json data(dict)
+@Output: Nothing, calls a function to put object onto rapid
 '''
 def receive(event, data):
     data = json.loads(data)
-    print(data)
-    print(type(data))
     if event == "CreateComment":
         jsonObject = create_comment(session, data['user-id'], data['post-id'], data['content'])
-        #send(event, jsonObject)
+        send(event, jsonObject)
     elif event == "UpdateComment":
         jsonObject = update_comment(session, data['comment-id'], data['user-id'], data['content'])
-        #send(event, jsonObject)
+        send(event, jsonObject)
     elif event == "DeleteComment":
         jsonObject = delete_comment(session, data['user-id'], data['comment-id'])
         send(event, jsonObject)
@@ -62,49 +64,3 @@ for event in events:
     
 channel.basic_consume(queue='comments', on_message_callback=callback, auto_ack=True)
 channel.start_consuming()
-
-
-
-# Test stuff
-'''
-comments = get_all_comments(session)
-for comment in comments:
-    print(comment.id)
-    print(comment.authorId)
-    print(comment.postId)
-    print(comment.content)
-
-'''
-
-
-
-'''
-
-#jsonob = json.dumps({'user-id': 3, 'post-id': 5, 'content': "dajiidj"}, indent=2, default=str)
-#event = "CreateComment"
-
-#jsonob = json.dumps({'comment-id': 5, 'user-id': 3, 'content': "33333333332"}, indent=2, default=str)
-#event = "UpdateComment"
-#receive(event, jsonob)
-#session, cId, aId, newContent
-comments = get_all_comments(session)
-for comment in comments:
-    print(comment.id)
-    print(comment.authorId)
-    print(comment.postId)
-    print(comment.content)
-
-
-
-
-x = request_comments_for_post(session, 12)
-print(x)
-
-comments = get_all_comments(session)
-for comment in comments:
-    print(comment.id)
-    print(comment.authorId)
-    print(comment.postId)
-    print(comment.content)
-'''
-
