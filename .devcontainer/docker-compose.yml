@@ -45,7 +45,6 @@ services:
       - RABBITMQ_PASSWORD=guest
     restart: unless-stopped
   
-  
   database:
     image: postgres:latest
     container_name: postgres
@@ -54,3 +53,11 @@ services:
     env_file: database.conf
     restart: unless-stopped
 
+  app:
+    build: ..
+    ports:
+      - 5000:5000
+    depends_on:
+      - database
+      - rabbitmq
+    restart: unless-stopped
