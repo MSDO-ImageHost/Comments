@@ -32,19 +32,19 @@ def receive(event, data):
     data = json.loads(data)
     if event == "CreateComment":
         jsonObject = create_comment(session, data['user-id'], data['post-id'], data['content'])
-        send(event, jsonObject)
+        send("ConfirmCommentCreation", jsonObject)
     elif event == "UpdateComment":
         jsonObject = update_comment(session, data['comment-id'], data['user-id'], data['content'])
-        send(event, jsonObject)
+        send("ConfirmCommentUpdate", jsonObject)
     elif event == "DeleteComment":
         jsonObject = delete_comment(session, data['user-id'], data['comment-id'])
-        send(event, jsonObject)
+        send("ConfirmCommentDelete", jsonObject)
     elif event == "RequestComment":
         jsonObject = request_comment(session, data['comment-id'])
-        send(event, jsonObject)
+        send("ReturnComment", jsonObject)
     elif event == "RequestCommentsForPost":
         jsonObject = request_comments_for_post(session, data['post-id'])
-        send(event, jsonObject)
+        send("ReturnCommentsForPost", jsonObject)
 
 def callback(channel, method, properties, body):
     event = method.routing_key
