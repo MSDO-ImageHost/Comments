@@ -8,6 +8,8 @@ import json
 import pika
 import sys
 
+# THIS RECEIVER TESTER - receives the return events from the primary application
+
 # For the db part
 engine = create_engine(DATABASE_CONNECTION_URI, echo = True) #Connect to a specific database, remove echo later
 Base.metadata.create_all(bind=engine) # From the base, create all the tables in Base to the connected DB
@@ -15,7 +17,8 @@ Session = sessionmaker(bind=engine) #Create a session factory
 session = Session() #Start a session with the engine
 # end of db part
 
-events = ['CreateComment', 'UpdateComment', 'DeleteComment', 'RequestComment', 'RequestCommentsForPost']
+#events = ['CreateComment', 'UpdateComment', 'DeleteComment', 'RequestComment', 'RequestCommentsForPost']
+events = ['ConfirmCommentCreation', 'ConfirmCommentUpdate', 'ConfirmCommentDelete', 'ReturnComment', 'ReturnCommentsForPost']
 
 def send(event, data):
     channel.basic_publish(exchange='rapid', routing_key=event, body=data)
@@ -23,6 +26,7 @@ def send(event, data):
 '''
 @Input: event, json data(dict)
 @Output: Nothing, sends a json object onto rapid
+'''
 '''
 def receive(event, data):
     data = json.loads(data)
@@ -43,6 +47,21 @@ def receive(event, data):
     elif event == "RequestCommentsForPost":
         jsonObject = request_comments_for_post(session, data['post-id'])
         send(event, jsonObject)
+'''
+def receive(event, data):
+    data = json.loads(data)
+    print(data)
+    print(type(data))
+    if event == "ConfirmCommentCreation":
+        print(data)
+    elif event == "ConfirmCommentUpdate":
+        print(data)
+    elif event == "ConfirmCommentDelete":
+        print(data)
+    elif event == "ReturnComment":
+        print(data)
+    elif event == "ReturnCommentsForPost":
+        print(data)
 
 def callback(channel, method, properties, body):
     event = method.routing_key
