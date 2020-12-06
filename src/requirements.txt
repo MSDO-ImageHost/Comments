@@ -3,3 +3,5 @@ flask-sqlalchemy==2.3.0
 psycopg2-binary
 pika
 unittest
+python-jose[cryptography]
+# This is for the dockerfile doing the testing

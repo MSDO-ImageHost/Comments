@@ -2,3 +2,4 @@ flask==1.0.2
 flask-sqlalchemy==2.3.0
 psycopg2-binary
 pika
+python-jose[cryptography]
