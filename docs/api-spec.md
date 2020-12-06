@@ -36,7 +36,7 @@ Response
 {
     "http-response": "HTTP response",
     "comment-id": "<comment-id>",
-    "update-timestamp": "<ISO8601 timestamp>",
+    "update-timestamp": "<ISO8601 timestamp>"
 }
 ```
 
@@ -70,7 +70,7 @@ Response
     "comment-id": "<commend-id>",
     "post-id": "<post-id>",
     "created-at": "<ISO8601 timestamp>",
-    "content": "<content>"
+    "content": "<content>",
     "http-response": "HTTP response code"
 }
 ```
