@@ -13,9 +13,9 @@ Request
 Response
 ```json
 {
-    "commentID": "<comment-id>",
-    "confirm-create": "HTTP response",
-    "comment-timestamp": "<ISO8601 timestamp>"
+    "comment-id": "<comment-id>",
+    "http-response": "HTTP response",
+    "created-at": "<ISO8601 timestamp>"
 }
 ```
 
@@ -34,8 +34,8 @@ Request
 Response
 ```json
 {
-    "confirm-update": "<Boolean>",
-    "commentID": "<comment-id>",
+    "http-response": "HTTP response",
+    "comment-id": "<comment-id>",
     "update-timestamp": "<ISO8601 timestamp>",
 }
 ```
@@ -52,7 +52,7 @@ Request
 Response
 ```json
 {
-    "confirm-delete": "<HTTP response code>"
+    "http-response": "HTTP response"
 }
 ```
 
@@ -70,7 +70,8 @@ Response
     "comment-id": "<commend-id>",
     "post-id": "<post-id>",
     "created-at": "<ISO8601 timestamp>",
-    "comment-content": "<content>"
+    "content": "<content>"
+    "http-response": "HTTP response code"
 }
 ```
 
