@@ -53,14 +53,14 @@ def callback(channel, method, properties, body):
     print(body)
     print(receive(event, body))
 
+if __name__ == '__main__':
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host='rabbitmq'))
+    channel = connection.channel()
+    channel.exchange_declare(exchange='rapid', exchange_type='direct')
+    channel.queue_declare('comments')
 
-connection = pika.BlockingConnection(pika.ConnectionParameters(host='rabbitmq'))
-channel = connection.channel()
-channel.exchange_declare(exchange='rapid', exchange_type='direct')
-channel.queue_declare('comments')
-
-for event in events:
-    channel.queue_bind(queue='comments', exchange='rapid', routing_key=event)
-    
-channel.basic_consume(queue='comments', on_message_callback=callback, auto_ack=True)
-channel.start_consuming()
+    for event in events:
+        channel.queue_bind(queue='comments', exchange='rapid', routing_key=event)
+        
+    channel.basic_consume(queue='comments', on_message_callback=callback, auto_ack=True)
+    channel.start_consuming()
