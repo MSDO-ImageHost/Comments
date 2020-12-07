@@ -2,6 +2,7 @@ name: Build docker-compose, runs test, and pushes to dockerhub
 on: push
 jobs:
   test:
+    name: Build docker-compose, and run tests
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -11,6 +12,7 @@ jobs:
       run: docker-compose -f dev-compose.yaml run test
       
   push_to_registry:
+    needs: [test]
     name: Push Docker image to Docker Hub
     runs-on: ubuntu-latest
     steps:
