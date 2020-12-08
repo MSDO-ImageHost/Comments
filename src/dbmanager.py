@@ -2,6 +2,10 @@ from datetime import datetime
 from models import Base, Comment
 import json
 
+user_role_range = [x for x in range(10)]
+mod_role_range = [x for x in range(10,20)]
+admin_role_range = [x for x in range(20,30)]
+
 '''
 For testing. Given a session, returns all objects for that session.
 '''
@@ -13,7 +17,7 @@ def get_all_comments(session):
 def remove_all_comments(session):
     comments = get_all_comments(session)
     for comment in comments:
-        delete_comment(session, comment.authorId, comment.id)
+        delete_comment(session, comment.authorId, comment.id, 25)
 
 '''
 For testing
@@ -59,10 +63,10 @@ and the new content.
 @Return - id of the comment being changed, http response code, 
 ISO8601 timestamp representing when it was modified.
 '''
-def update_comment(session, cId, aId, newContent):
+def update_comment(session, cId, aId, newContent, role):
     try:
         comment = session.query(Comment).get(cId) # Might not exist
-        if(aId == comment.authorId):
+        if(aId == comment.authorId or role in mod_role_range or role in admin_role_range):
             comment.content = newContent
             comment.postedAt = datetime.now().isoformat()
             session.commit()
@@ -77,11 +81,11 @@ def update_comment(session, cId, aId, newContent):
 and the id of the comment
 @Output - Http response code
 '''
-def delete_comment(session, aId, cId):
+def delete_comment(session, aId, cId, role):
     #apparently it has to be done in two steps. Can't just call .delete()
     try:
         comment = session.query(Comment).get(cId) # Might not exist
-        if(aId == comment.authorId):
+        if(aId == comment.authorId or role in mod_role_range or role in admin_role_range):
             session.delete(comment)
             session.commit()
             return json.dumps({'http_response': 200}, indent=2, default=str)
