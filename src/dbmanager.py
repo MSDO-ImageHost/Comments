@@ -33,9 +33,9 @@ ISO8601 timestamp(when it was created), and the content.
 def request_comment(session, cId):
     try:
         comment = session.query(Comment).get(cId)
-        return json.dumps({'comment-id': comment.id, 'post-id': comment.postId, 'created-at': comment.postedAt, 'content': comment.content, 'http-response': 200}, indent=2, default=str)
+        return json.dumps({'comment_id': comment.id, 'post_id': comment.postId, 'created_at': comment.postedAt, 'content': comment.content, 'http_response': 200}, indent=2, default=str)
     except:
-        return json.dumps({'comment-id': cId, 'post-id': 999999, 'created-at': 999999, 'content': "Could not find comment", 'http-response': 403}, indent=2, default=str)
+        return json.dumps({'comment_id': cId, 'post_id': 999999, 'created_at': 999999, 'content': "Could not find comment", 'http_response': 403}, indent=2, default=str)
 '''
 @Input - A session, authorId, postId, content
 @Output - The created comment's id, ISO8601 timestamp for when it was created, 
@@ -50,7 +50,7 @@ def create_comment(session, authorId, postId, content):
     session.add(comment)
     session.commit()
     session.refresh(comment) # Needs this to refer to comment.id
-    return json.dumps({'comment-id': comment.id, 'http-response': 200, 'created-at': comment.postedAt}, indent=2, default=str)
+    return json.dumps({'comment_id': comment.id, 'http_response': 200, 'created_at': comment.postedAt}, indent=2, default=str)
     
 '''
 @Input - A session, id of the comment user wants to change,
@@ -66,11 +66,11 @@ def update_comment(session, cId, aId, newContent):
             comment.content = newContent
             comment.postedAt = datetime.now().isoformat()
             session.commit()
-            return json.dumps({'http-response': 200, 'comment-id': comment.id, 'update-timestamp': comment.postedAt}, indent=2, default=str)
+            return json.dumps({'http_response': 200, 'comment_id': comment.id, 'update_timestamp': comment.postedAt}, indent=2, default=str)
         else:
-            return json.dumps({'http-response': 403, 'comment-id': comment.id, 'update-timestamp': comment.postedAt}, indent=2, default=str)
+            return json.dumps({'http_response': 403, 'comment_id': comment.id, 'update_timestamp': comment.postedAt}, indent=2, default=str)
     except:
-        return json.dumps({'http-response': 403, 'comment-id': cId, 'update-timestamp': 1000001}, indent=2, default=str)
+        return json.dumps({'http_response': 403, 'comment_id': cId, 'update_timestamp': 1000001}, indent=2, default=str)
         
 '''
 @Input - A session, id of the user/author wanting to delete comment,
@@ -84,11 +84,11 @@ def delete_comment(session, aId, cId):
         if(aId == comment.authorId):
             session.delete(comment)
             session.commit()
-            return json.dumps({'http-response': 200}, indent=2, default=str)
+            return json.dumps({'http_response': 200}, indent=2, default=str)
         else:
-            return json.dumps({'http-response': 403}, indent=2, default=str)
+            return json.dumps({'http_response': 403}, indent=2, default=str)
     except:
-        return json.dumps({'http-response': 403}, indent=2, default=str)
+        return json.dumps({'http_response': 403}, indent=2, default=str)
 
     
 '''
@@ -100,4 +100,4 @@ def request_comments_for_post(session, pId):
     commentIdArray = []
     for comment in comments:
         commentIdArray.append(comment.id)
-    return json.dumps({'list-of-comment-ids': commentIdArray}, indent=2, default=str)
+    return json.dumps({'list_of_comment_ids': commentIdArray}, indent=2, default=str)

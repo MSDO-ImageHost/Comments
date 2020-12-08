@@ -47,28 +47,28 @@ def receive(event, data, properties):
 
     if(verify(properties.headers['jwt'])):
         if event == "CreateComment":
-            jsonObject = create_comment(session, data['user-id'], data['post-id'], data['content'])
+            jsonObject = create_comment(session, data['user_id'], data['post_id'], data['content'])
             # Get the actual http response from the action and put it into properties
-            httpResponse = json.loads(jsonObject)['http-response']
-            properties.headers['http-response'] = httpResponse
+            httpResponse = json.loads(jsonObject)['http_response']
+            properties.headers['http_response'] = httpResponse
             send("ConfirmCommentCreation", jsonObject, properties)
         elif event == "UpdateComment":
-            jsonObject = update_comment(session, data['comment-id'], data['user-id'], data['content'])
-            httpResponse = json.loads(jsonObject)['http-response']
-            properties.headers['http-response'] = httpResponse
+            jsonObject = update_comment(session, data['comment_id'], data['user_id'], data['content'])
+            httpResponse = json.loads(jsonObject)['http_response']
+            properties.headers['http_response'] = httpResponse
             send("ConfirmCommentUpdate", jsonObject, properties)
         elif event == "DeleteComment":
-            jsonObject = delete_comment(session, data['user-id'], data['comment-id'])
-            httpResponse = json.loads(jsonObject)['http-response']
-            properties.headers['http-response'] = httpResponse
+            jsonObject = delete_comment(session, data['user_id'], data['comment_id'])
+            httpResponse = json.loads(jsonObject)['http_response']
+            properties.headers['http_response'] = httpResponse
             send("ConfirmCommentDelete", jsonObject, properties)
         elif event == "RequestComment":
-            jsonObject = request_comment(session, data['comment-id'])
-            httpResponse = json.loads(jsonObject)['http-response']
-            properties.headers['http-response'] = httpResponse
+            jsonObject = request_comment(session, data['comment_id'])
+            httpResponse = json.loads(jsonObject)['http_response']
+            properties.headers['http_response'] = httpResponse
             send("ReturnComment", jsonObject, properties)
         elif event == "RequestCommentsForPost":
-            jsonObject = request_comments_for_post(session, data['post-id'])
+            jsonObject = request_comments_for_post(session, data['post_id'])
             send("ReturnCommentsForPost", jsonObject, properties)
         else:
             pass
