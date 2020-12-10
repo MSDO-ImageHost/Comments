@@ -92,7 +92,7 @@ def callback(channel, method, properties, body):
     receive(event, body, properties)
 
 if __name__ == '__main__':
-    
+    '''
     comments = get_all_comments(session)
     for comment in comments:
         print(comment.id)
@@ -115,4 +115,4 @@ if __name__ == '__main__':
         channel.queue_bind(queue='comments', exchange='rapid', routing_key=event)
         
     channel.basic_consume(queue='comments', on_message_callback=callback, auto_ack=True)
-    channel.start_consuming()'''
+    channel.start_consuming()
