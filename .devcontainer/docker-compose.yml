@@ -24,8 +24,15 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - TZ=Europe/Copenhagen
-      - DATABASE_CONN_URI=postgres@database:5432/postgress
-      - RABBITMQ_CONN_URI=amqp://guest:guest@rabbitmq:5672/
+      #- DATABASE_CONN_URI=postgres@database:5432/postgress
+      #- RABBITMQ_CONN_URI=amqp://guest:guest@rabbitmq:5672/
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - RABBITMQ_USERNAME=${RABBITMQ_PASSWORD}
+      - RABBITMQ_PASSWORD=${RABBITMQ_USERNAME}
     cap_add:
       - SYS_PTRACE
     security_opt:
@@ -39,10 +46,11 @@ services:
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq
     ports:
-      - 15672:15672
-    environment:
-      - RABBITMQ_USERNAME=guest
-      - RABBITMQ_PASSWORD=guest
+        - 5672:5672
+        - 15672:15672
+    environment: 
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USERNAME}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
     restart: unless-stopped
   
   database:
@@ -50,7 +58,12 @@ services:
     container_name: postgres
     volumes:
       - db-storage:/var/lib/postgresql/data
-    env_file: database.conf
+    environment: 
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_DB=${POSTGRES_DB}
     restart: unless-stopped
 
   app:
@@ -60,4 +73,12 @@ services:
     depends_on:
       - database
       - rabbitmq
+    environment: 
+      - RABBITMQ_USERNAME=${RABBITMQ_PASSWORD}
+      - RABBITMQ_PASSWORD=${RABBITMQ_USERNAME}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_DB=${POSTGRES_DB}
     restart: unless-stopped

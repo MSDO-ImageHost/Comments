@@ -93,5 +93,5 @@ class TestComments(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    remove_all_comments(session)
+    #remove_all_comments(session)
     unittest.main()

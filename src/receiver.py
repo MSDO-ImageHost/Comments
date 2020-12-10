@@ -9,6 +9,7 @@ import json
 import pika
 import sys
 import time
+from config import AMQP_PASSWORD, AMQP_USER, AMQP_URI
 
 # For the db part
 engine = create_engine(DATABASE_CONNECTION_URI, echo = True) #Connect to a specific database, remove echo later
@@ -84,12 +85,28 @@ def callback(channel, method, properties, body):
     print("###################################")
     print(method)
     print(properties)
+    print("Imma kms")
+    print(verify(properties.headers['jwt']))
     print(body)
     print("###################################")
     receive(event, body, properties)
 
 if __name__ == '__main__':
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host='rabbitmq'))
+    
+    comments = get_all_comments(session)
+    for comment in comments:
+        print(comment.id)
+        print(comment.authorId)
+        print(comment.postId)
+        print(comment.content)
+    '''
+
+    credentials = pika.PlainCredentials(AMQP_USER, AMQP_PASSWORD)
+    connection = pika.BlockingConnection(pika.ConnectionParameters(
+        host='rabbitmq',
+        port=5672,
+        virtual_host='/',
+        credentials=credentials))
     channel = connection.channel()
     channel.exchange_declare(exchange='rapid', exchange_type='direct')
     channel.queue_declare('comments')
@@ -98,4 +115,4 @@ if __name__ == '__main__':
         channel.queue_bind(queue='comments', exchange='rapid', routing_key=event)
         
     channel.basic_consume(queue='comments', on_message_callback=callback, auto_ack=True)
-    channel.start_consuming()
+    channel.start_consuming()'''
