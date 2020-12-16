@@ -106,6 +106,6 @@ def request_comments_for_post(session, pId):
         for comment in comments:
             jsonDump = json.dumps({'comment_id': comment.id, 'post_id': comment.postId, 'created_at': comment.postedAt, 'content': comment.content}, indent=2, default=str)
             jsonComments.append(json.loads(jsonDump))
-        return json.dumps({'list_of_comment_ids': jsonComments}, indent=2, default=str)
+        return json.dumps({'list_of_comments': jsonComments}, indent=2, default=str)
     except:
-        return json.dumps({'list_of_comment_ids': '[]'}, indent=2, default=str)
+        return json.dumps({'list_of_comments': '[]'}, indent=2, default=str)

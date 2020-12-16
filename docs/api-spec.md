@@ -96,6 +96,6 @@ Response
 Routing Key - "ReturnCommentsForPost"
 ```json
 {
-    "list_of_comment_ids": "<Array of comment id's associated with post>"
+    "list_of_comments": "<Array of comments, each element contains comments id, post id, creation time, and content.>"
 }
 ```
