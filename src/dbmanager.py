@@ -37,7 +37,7 @@ ISO8601 timestamp(when it was created), and the content.
 def request_comment(session, cId):
     try:
         comment = session.query(Comment).get(cId)
-        return json.dumps({'comment_id': comment.id, 'post_id': comment.postId, 'created_at': comment.postedAt, 'content': comment.content, 'http_response': 200}, indent=2, default=str)
+        return json.dumps({'comment_id': comment.id, 'author_id': comment.authorId, 'post_id': comment.postId, 'created_at': comment.postedAt, 'content': comment.content, 'http_response': 200}, indent=2, default=str)
     except:
         return json.dumps({'comment_id': cId, 'post_id': 999999, 'created_at': 999999, 'content': "Could not find comment", 'http_response': 403}, indent=2, default=str)
 '''
@@ -104,7 +104,7 @@ def request_comments_for_post(session, pId):
         comments = session.query(Comment).filter(Comment.postId==pId).all()
         jsonComments = []
         for comment in comments:
-            jsonDump = json.dumps({'comment_id': comment.id, 'post_id': comment.postId, 'created_at': comment.postedAt, 'content': comment.content}, indent=2, default=str)
+            jsonDump = json.dumps({'comment_id': comment.id, 'author_id': comment.authorId, 'post_id': comment.postId, 'created_at': comment.postedAt, 'content': comment.content}, indent=2, default=str)
             jsonComments.append(json.loads(jsonDump))
         return json.dumps({'list_of_comments': jsonComments}, indent=2, default=str)
     except:
