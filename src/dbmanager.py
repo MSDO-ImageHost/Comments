@@ -97,11 +97,15 @@ def delete_comment(session, aId, cId, role):
     
 '''
 @Input - A session, and the id of a post
-@Output - A list of comment id's which is connected to that post.
+@Output - A list of comments in json format
 '''
 def request_comments_for_post(session, pId):
-    comments = session.query(Comment).filter(Comment.postId==pId).all()
-    commentIdArray = []
-    for comment in comments:
-        commentIdArray.append(comment.id)
-    return json.dumps({'list_of_comment_ids': commentIdArray}, indent=2, default=str)
+    try:
+        comments = session.query(Comment).filter(Comment.postId==pId).all()
+        jsonComments = []
+        for comment in comments:
+            jsonDump = json.dumps({'comment_id': comment.id, 'post_id': comment.postId, 'created_at': comment.postedAt, 'content': comment.content}, indent=2, default=str)
+            jsonComments.append(json.loads(jsonDump))
+        return json.dumps({'list_of_comment_ids': jsonComments}, indent=2, default=str)
+    except:
+        return json.dumps({'list_of_comment_ids': '[]'}, indent=2, default=str)
