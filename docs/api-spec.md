@@ -75,7 +75,8 @@ Response
 Routing Key - "ReturnComment"
 ```json
 {
-    "comment_id": "<Id of the author of comment>",
+    "comment_id": "<Id of the comment>",
+    "author_id": "<Id of the author of comment",
     "post_id": "<Id of the post associated with comment>",
     "created_at": "<ISO8601 timestamp>",
     "content": "<content>",
