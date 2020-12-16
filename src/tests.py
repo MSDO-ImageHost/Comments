@@ -39,7 +39,7 @@ class TestComments(unittest.TestCase):
         # Clean database from test comment entry
         delete_comment(session, self.test_auth_id, createJson['comment_id'], self.admin_role)
 
-        self.assertEqual(loadedJson['http_response'], 403, "[-] Requests with wrong ID, positive HTTP response anyways.")
+        self.assertEqual(httpResponse, 403, "[-] Requests with wrong ID, positive HTTP response anyways.")
 
     def test_update_comment_content(self):
         #createJson = json.loads(create_comment(session, 999999, 999999, "This is a test"))
@@ -93,5 +93,4 @@ class TestComments(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    #remove_all_comments(session)
     unittest.main()
