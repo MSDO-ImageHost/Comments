@@ -2,8 +2,9 @@ version: '3.7'
 
 
 volumes:
-  db-storage:
   rabbitmq-data:
+  db_data:
+  
 
 
 services:
@@ -23,16 +24,18 @@ services:
       - ~/.ssh:/root/.ssh
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      - TZ=Europe/Copenhagen
+      TZ: 'Europe/Copenhagen'
       #- DATABASE_CONN_URI=postgres@database:5432/postgress
       #- RABBITMQ_CONN_URI=amqp://guest:guest@rabbitmq:5672/
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_HOST=${POSTGRES_HOST}
-      - POSTGRES_PORT=${POSTGRES_PORT}
-      - POSTGRES_DB=${POSTGRES_DB}
-      - RABBITMQ_USERNAME=${RABBITMQ_PASSWORD}
-      - RABBITMQ_PASSWORD=${RABBITMQ_USERNAME}
+      RABBITMQ_DEFAULT_USER: 'guest'
+      RABBITMQ_DEFAULT_PASS: 'guest'
+      MYSQL_DATABASE: 'commentdb'
+      # So you don't have to use root, but you can if you like
+      MYSQL_USER: 'user'
+      # You can use whatever password you like
+      MYSQL_PASSWORD: '1234'
+      # Password for root access
+      MYSQL_ROOT_PASSWORD: '1234'
     cap_add:
       - SYS_PTRACE
     security_opt:
@@ -49,21 +52,25 @@ services:
         - 5672:5672
         - 15672:15672
     environment: 
-      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USERNAME}
-      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
+      RABBITMQ_DEFAULT_USER: 'guest'
+      RABBITMQ_DEFAULT_PASS: 'guest'
     restart: unless-stopped
-  
-  database:
-    image: postgres:latest
-    container_name: postgres
+
+  mySQL:
+    image: mysql:8
+    container_name: comment_db
     volumes:
-      - db-storage:/var/lib/postgresql/data
-    environment: 
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_HOST=${POSTGRES_HOST}
-      - POSTGRES_PORT=${POSTGRES_PORT}
-      - POSTGRES_DB=${POSTGRES_DB}
+      - db_data:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: 'commentdb'
+      # So you don't have to use root, but you can if you like
+      MYSQL_USER: 'user'
+      # You can use whatever password you like
+      MYSQL_PASSWORD: '1234'
+      # Password for root access
+      MYSQL_ROOT_PASSWORD: '1234'
+    ports:
+      - 3306:3306
     restart: unless-stopped
 
   app:
@@ -71,14 +78,16 @@ services:
     ports:
       - 5000:5000
     depends_on:
-      - database
+      - mySQL
       - rabbitmq
     environment: 
-      - RABBITMQ_USERNAME=${RABBITMQ_PASSWORD}
-      - RABBITMQ_PASSWORD=${RABBITMQ_USERNAME}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_HOST=${POSTGRES_HOST}
-      - POSTGRES_PORT=${POSTGRES_PORT}
-      - POSTGRES_DB=${POSTGRES_DB}
+      RABBITMQ_DEFAULT_USER: 'guest'
+      RABBITMQ_DEFAULT_PASS: 'guest'
+      MYSQL_DATABASE: 'commentdb'
+      # So you don't have to use root, but you can if you like
+      MYSQL_USER: 'user'
+      # You can use whatever password you like
+      MYSQL_PASSWORD: '1234'
+      # Password for root access
+      MYSQL_ROOT_PASSWORD: '1234'
     restart: unless-stopped

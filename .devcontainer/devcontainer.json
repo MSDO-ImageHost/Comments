@@ -3,7 +3,7 @@
 	"name": "Comments dev",
 	"dockerComposeFile": "docker-compose.yml",
 	"service": "vscode",
-	"runServices": ["vscode", "rabbitmq", "database", "app"],
+	"runServices": ["vscode", "rabbitmq", "app", "mySQL"],
 	"workspaceFolder": "/workspace",
 	"remoteUser": "vscode",
 
