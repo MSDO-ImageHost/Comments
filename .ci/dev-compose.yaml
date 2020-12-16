@@ -58,7 +58,7 @@ volumes:
     build: ../src
     depends_on:
       - app
-      - database
+      - mySQL
       - rabbitmq
     environment: 
       RABBITMQ_DEFAULT_USER: 'guest'
