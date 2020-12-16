@@ -6,6 +6,7 @@ volumes:
   db_data:
   rabbitmq-data:
   
+services:
   rabbitmq:
     image: rabbitmq:3-management
     volumes:
