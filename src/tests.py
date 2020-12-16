@@ -2,6 +2,7 @@ import unittest
 import json
 from dbmanager import get_all_comments, request_comment, update_comment, delete_comment, request_comments_for_post, create_comment, remove_all_comments
 from receiver import session, send
+import time
 
 class TestComments(unittest.TestCase):
     # Tests for dbmanager class
@@ -93,4 +94,5 @@ class TestComments(unittest.TestCase):
 
 
 if __name__ == '__main__':
+    time.sleep(40)
     unittest.main()
