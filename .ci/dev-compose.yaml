@@ -75,4 +75,5 @@ services:
       MYSQL_PASSWORD: '1234'
       # Password for root access
       MYSQL_ROOT_PASSWORD: '1234'
+    command: ["./wait.sh", "mySQL:3306", "--", "python", "tests.py"]
     restart: unless-stopped
