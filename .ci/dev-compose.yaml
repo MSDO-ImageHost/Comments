@@ -48,6 +48,7 @@ services:
       RABBITMQ_DEFAULT_USER: 'guest'
       RABBITMQ_DEFAULT_PASS: 'guest'
       RABBITMQ_HOST: 'rabbitmq'
+      RABBITMQ_PORT: '5672'
       MYSQL_DATABASE: 'commentdb'
       MYSQL_HOST: 'mySQL'
       # So you don't have to use root, but you can if you like
@@ -68,6 +69,7 @@ services:
       RABBITMQ_DEFAULT_USER: 'guest'
       RABBITMQ_DEFAULT_PASS: 'guest'
       RABBITMQ_HOST: 'rabbitmq'
+      RABBITMQ_PORT: '5672'
       MYSQL_DATABASE: 'commentdb'
       # So you don't have to use root, but you can if you like
       MYSQL_USER: 'user'
