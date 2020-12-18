@@ -34,6 +34,7 @@ services:
       MYSQL_PASSWORD: '1234'
       # Password for root access
       MYSQL_ROOT_PASSWORD: '1234'
+      MYSQL_HOST: 'mySQL'
     cap_add:
       - SYS_PTRACE
     security_opt:
@@ -67,6 +68,7 @@ services:
       MYSQL_PASSWORD: '1234'
       # Password for root access
       MYSQL_ROOT_PASSWORD: '1234'
+      MYSQL_HOST: 'mySQL'
     ports:
       - 3306:3306
     restart: unless-stopped
@@ -82,6 +84,7 @@ services:
       RABBITMQ_DEFAULT_USER: 'guest'
       RABBITMQ_DEFAULT_PASS: 'guest'
       MYSQL_DATABASE: 'commentdb'
+      MYSQL_HOST: 'mySQL'
       # So you don't have to use root, but you can if you like
       MYSQL_USER: 'user'
       # You can use whatever password you like

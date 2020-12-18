@@ -2,7 +2,7 @@ import os
 
 USER = os.environ['MYSQL_USER']
 PASSWORD = os.environ['MYSQL_PASSWORD']
-HOST = "mySQL"
+HOST = os.environ['MYSQL_HOST']
 DATABASE = os.environ['MYSQL_DATABASE']
 DATABASE_CONNECTION_URI = f'mysql+mysqlconnector://{USER}:{PASSWORD}@{HOST}:3306/{DATABASE}'
 
