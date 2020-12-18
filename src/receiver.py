@@ -47,8 +47,8 @@ def verify(token):
 def receive(event, data, properties):
     data = json.loads(data)
     jwt = verify(properties.headers['jwt'])
-    user_id = jwt['sub']
-    role = jwt['role']
+    user_id = int(jwt['sub'])
+    role = int(jwt['role'])
 
     if event == "CreateComment":
         if(jwt):
@@ -63,7 +63,7 @@ def receive(event, data, properties):
 
     elif event == "UpdateComment":
         if(jwt):
-            jsonObject = update_comment(session, data['comment_id'], user_id, data['content'], role)
+            jsonObject = update_comment(session, int(data['comment_id']), user_id, data['content'], role)
             httpResponse = json.loads(jsonObject)['http_response']
             properties.headers['http_response'] = httpResponse
             send("ConfirmCommentUpdate", jsonObject, properties)
@@ -73,7 +73,7 @@ def receive(event, data, properties):
 
     elif event == "DeleteComment":
         if(jwt):
-            jsonObject = delete_comment(session, user_id, data['comment_id'], role)
+            jsonObject = delete_comment(session, user_id, int(data['comment_id']), role)
             httpResponse = json.loads(jsonObject)['http_response']
             properties.headers['http_response'] = httpResponse
             send("ConfirmCommentDelete", jsonObject, properties)
@@ -88,7 +88,7 @@ def receive(event, data, properties):
         send("ReturnComment", jsonObject, properties)
 
     elif event == "RequestCommentsForPost":
-        jsonObject = request_comments_for_post(session, data['post_id'])
+        jsonObject = request_comments_for_post(session, int(data['post_id']))
         send("ReturnCommentsForPost", jsonObject, properties)
 
     else:
