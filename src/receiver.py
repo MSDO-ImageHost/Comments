@@ -55,7 +55,7 @@ def receive(event, data, properties):
 
     if event == "CreateComment":
         if(jwt):
-            jsonObject = create_comment(session, user_id, data['post_id'], data['content'])
+            jsonObject = create_comment(session, user_id, data['post_id'], data['content'], properties)
             # Get the actual http response from the action and put it into properties
             httpResponse = json.loads(jsonObject)['http_response']
             properties.headers['http_response'] = httpResponse
@@ -68,7 +68,7 @@ def receive(event, data, properties):
 
     elif event == "UpdateComment":
         if(jwt):
-            jsonObject = update_comment(session, int(data['comment_id']), user_id, data['content'], role)
+            jsonObject = update_comment(session, int(data['comment_id']), user_id, data['content'], role, properties)
             httpResponse = json.loads(jsonObject)['http_response']
             properties.headers['http_response'] = httpResponse
             send("ConfirmCommentUpdate", jsonObject, properties)
@@ -80,7 +80,7 @@ def receive(event, data, properties):
 
     elif event == "DeleteComment":
         if(jwt):
-            jsonObject = delete_comment(session, user_id, int(data['comment_id']), role)
+            jsonObject = delete_comment(session, user_id, int(data['comment_id']), role, properties)
             httpResponse = json.loads(jsonObject)['http_response']
             properties.headers['http_response'] = httpResponse
             send("ConfirmCommentDelete", jsonObject, properties)
@@ -91,14 +91,14 @@ def receive(event, data, properties):
             print(f'Deleted comment with {jsonObject}')
 
     elif event == "RequestComment":
-        jsonObject = request_comment(session, data['comment_id'])
+        jsonObject = request_comment(session, data['comment_id'], properties)
         httpResponse = json.loads(jsonObject)['http_response']
         properties.headers['http_response'] = httpResponse
         send("ReturnComment", jsonObject, properties)
         print(f'Requested comment with {jsonObject}')
 
     elif event == "RequestCommentsForPost":
-        jsonObject = request_comments_for_post(session, int(data['post_id']))
+        jsonObject = request_comments_for_post(session, int(data['post_id']), properties)
         properties.headers['http_response'] = 200
         send("ReturnCommentsForPost", jsonObject, properties)
         print(f'Requested comment for post {jsonObject}')
