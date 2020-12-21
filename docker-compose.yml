@@ -1,0 +1,58 @@
+version: '3.7'
+
+
+volumes:
+  rabbitmq-data:
+  db_data:
+
+networks:
+  public:
+  rabbit-network:
+    external:
+      name: webgateway_rabbit-network
+
+  
+services:
+  mySQL:
+    image: mysql:8
+    container_name: comment_db
+    networks:
+      - public
+    volumes:
+      - db_data:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: 'commentdb'
+      # So you don't have to use root, but you can if you like
+      MYSQL_USER: 'user'
+      # You can use whatever password you like
+      MYSQL_PASSWORD: '1234'
+      # Password for root access
+      MYSQL_ROOT_PASSWORD: '1234'
+      MYSQL_HOST: 'mySQL'
+    ports:
+      - 3306:3306
+    restart: unless-stopped
+
+  app:
+    build: .
+    ports:
+      - 5001:5000
+    depends_on:
+      - mySQL
+    networks:
+      - public
+      - rabbit-network
+    environment: 
+      RABBITMQ_DEFAULT_USER: 'guest'
+      RABBITMQ_DEFAULT_PASS: 'guest'
+      RABBITMQ_HOST: 'rabbitmq'
+      RABBITMQ_PORT: '5672'
+      MYSQL_DATABASE: 'commentdb'
+      MYSQL_HOST: 'mySQL'
+      # So you don't have to use root, but you can if you like
+      MYSQL_USER: 'user'
+      # You can use whatever password you like
+      MYSQL_PASSWORD: '1234'
+      # Password for root access
+      MYSQL_ROOT_PASSWORD: '1234'
+    restart: unless-stopped
