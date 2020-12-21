@@ -10,7 +10,7 @@ import json
 import pika
 import sys
 import time
-from config import AMQP_PASSWORD, AMQP_USER, AMQP_URI
+from config import AMQP_PASSWORD, AMQP_USER, AMQP_URI, RABBITMQ_PORT, RABBITMQ_HOST
 
 # For the db part
 engine = create_engine(DATABASE_CONNECTION_URI) #Connect to a specific database, remove echo later
@@ -107,8 +107,8 @@ def callback(channel, method, properties, body):
 if __name__ == '__main__':
     credentials = pika.PlainCredentials(AMQP_USER, AMQP_PASSWORD)
     connection = pika.BlockingConnection(pika.ConnectionParameters(
-        host='rabbitmq',
-        port=5672,
+        host=RABBITMQ_HOST,
+        port=RABBITMQ_PORT,
         virtual_host='/',
         credentials=credentials))
     channel = connection.channel()
