@@ -48,6 +48,7 @@ def verify(token):
 '''
 def receive(event, data, properties):
     data = json.loads(data)
+    print(properties.headers)
     jwt = verify(properties.headers['jwt'])
     user_id = int(jwt['sub'])
     role = int(jwt['role'])
@@ -98,6 +99,7 @@ def receive(event, data, properties):
 
     elif event == "RequestCommentsForPost":
         jsonObject = request_comments_for_post(session, int(data['post_id']))
+        properties.headers['http_response'] = 200
         send("ReturnCommentsForPost", jsonObject, properties)
         print(f'Requested comment for post {jsonObject}')
 
@@ -115,6 +117,9 @@ def callback(channel, method, properties, body):
 
 if __name__ == '__main__':
     print("Trying to connect to rabbitmq")
+    print("Rabbit host:", RABBITMQ_HOST)
+    print("Rabbit user:", AMQP_USER)
+    print("Rabbit pass:", AMQP_PASSWORD)
     credentials = pika.PlainCredentials(AMQP_USER, AMQP_PASSWORD)
     connection = pika.BlockingConnection(pika.ConnectionParameters(
         host=RABBITMQ_HOST,
