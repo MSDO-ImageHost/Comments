@@ -41,7 +41,7 @@ def request_comment(session, cId, properties):
     try:
         comment = session.query(Comment).get(cId)
         return json.dumps({'comment_id': comment.id, 'author_id': comment.authorId, 'post_id': comment.postId, 'created_at': comment.postedAt, 'content': comment.content, 'http_response': 200}, indent=2, default=str)
-    except (sqlalchemy.exc.InterfaceError):
+    except (sqlalchemy.exc.InterfaceError, sqlalchemy.exc.OperationalError):
         jsonObject = json.dumps({'comment_id': 9999999, 'http_response': 403, 'created_at': 9999999}, indent=2, default=str)
         properties.headers['http_response'] = 503
         send("ConfirmCommentCreation", jsonObject, properties)
@@ -68,7 +68,7 @@ def create_comment(session, authorId, postId, content, properties):
         session.commit()
         session.refresh(comment) # Needs this to refer to comment.id
         return json.dumps({'comment_id': comment.id, 'http_response': 200, 'created_at': comment.postedAt}, indent=2, default=str)
-    except (sqlalchemy.exc.InterfaceError):
+    except (sqlalchemy.exc.InterfaceError, sqlalchemy.exc.OperationalError):
         jsonObject = json.dumps({'comment_id': 9999999, 'http_response': 403, 'created_at': 9999999}, indent=2, default=str)
         properties.headers['http_response'] = 503
         send("ConfirmCommentCreation", jsonObject, properties)
@@ -96,7 +96,7 @@ def update_comment(session, cId, aId, newContent, role, properties):
             return json.dumps({'http_response': 200, 'comment_id': comment.id, 'update_timestamp': comment.postedAt}, indent=2, default=str)
         else:
             return json.dumps({'http_response': 403, 'comment_id': comment.id, 'update_timestamp': comment.postedAt}, indent=2, default=str)
-    except (sqlalchemy.exc.InterfaceError):
+    except (sqlalchemy.exc.InterfaceError, sqlalchemy.exc.OperationalError):
         jsonObject = json.dumps({'http_response': 503, 'comment_id': 9999999, 'update_timestamp': 9999999}, indent=2, default=str)
         properties.headers['http_response'] = 503
         send("ConfirmCommentCreation", jsonObject, properties)
@@ -122,7 +122,7 @@ def delete_comment(session, aId, cId, role, properties):
             return json.dumps({'http_response': 200}, indent=2, default=str)
         else:
             return json.dumps({'http_response': 403}, indent=2, default=str)
-    except (sqlalchemy.exc.InterfaceError):
+    except (sqlalchemy.exc.InterfaceError, sqlalchemy.exc.OperationalError):
         jsonObject = json.dumps({'http_response': 503}, indent=2, default=str)
         properties.headers['http_response'] = 503
         send("ConfirmCommentCreation", jsonObject, properties)
@@ -146,7 +146,7 @@ def request_comments_for_post(session, pId, properties):
             jsonDump = json.dumps({'comment_id': comment.id, 'author_id': comment.authorId, 'post_id': comment.postId, 'created_at': comment.postedAt, 'content': comment.content}, indent=2, default=str)
             jsonComments.append(json.loads(jsonDump))
         return json.dumps({'list_of_comments': jsonComments}, indent=2, default=str)
-    except (sqlalchemy.exc.InterfaceError):
+    except (sqlalchemy.exc.InterfaceError, sqlalchemy.exc.OperationalError):
         jsonObject = json.dumps({'list_of_comments': jsonComments}, indent=2, default=str)
         properties.headers['http_response'] = 503
         send("ConfirmCommentCreation", jsonObject, properties)
