@@ -89,7 +89,7 @@ def receive(event, data, properties):
         print(f'Requested comment with {jsonObject}')
 
     elif event == "RequestCommentsForPost":
-        jsonObject = request_comments_for_post(int(data['post_id']), properties)
+        jsonObject = request_comments_for_post(data['post_id'], properties)
         properties.headers['http_response'] = 200
         send("ReturnCommentsForPost", jsonObject, properties)
         print(f'Requested comment for post {jsonObject}')
