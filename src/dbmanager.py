@@ -45,7 +45,8 @@ def request_comment(session, cId, properties):
         jsonObject = json.dumps({'comment_id': 9999999, 'http_response': 403, 'created_at': 9999999}, indent=2, default=str)
         properties.headers['http_response'] = 503
         send("ConfirmCommentCreation", jsonObject, properties)
-        raise Exception("Database is down, crashing service. Restarting, sending default error on rapid")
+        exit()
+        #raise Exception("Database is down, crashing service. Restarting, sending default error on rapid")
     except Exception as e:
         print("[-] Exception ", e.__class__, " occurred.")
         return json.dumps({'comment_id': 9999999, 'http_response': 403, 'created_at': 9999999}, indent=2, default=str)
@@ -71,7 +72,8 @@ def create_comment(session, authorId, postId, content, properties):
         jsonObject = json.dumps({'comment_id': 9999999, 'http_response': 403, 'created_at': 9999999}, indent=2, default=str)
         properties.headers['http_response'] = 503
         send("ConfirmCommentCreation", jsonObject, properties)
-        raise Exception("Database is down, crashing service. Restarting, sending default error on rapid")
+        exit()
+        #raise Exception("Database is down, crashing service. Restarting, sending default error on rapid")
     except Exception as e:
         print("[-] Exception ", e.__class__, " occurred.")
         return json.dumps({'comment_id': 9999999, 'http_response': 403, 'created_at': 9999999}, indent=2, default=str)
@@ -98,7 +100,8 @@ def update_comment(session, cId, aId, newContent, role, properties):
         jsonObject = json.dumps({'http_response': 503, 'comment_id': 9999999, 'update_timestamp': 9999999}, indent=2, default=str)
         properties.headers['http_response'] = 503
         send("ConfirmCommentCreation", jsonObject, properties)
-        raise Exception("Database is down, crashing service. Restarting, sending default error on rapid")
+        exit()
+        #raise Exception("Database is down, crashing service. Restarting, sending default error on rapid")
     except Exception as e:
         print("[-] Exception ", e.__class__, " occurred.")
         return json.dumps({'http_response': 503, 'comment_id': 9999999, 'update_timestamp': 9999999}, indent=2, default=str)
@@ -123,7 +126,8 @@ def delete_comment(session, aId, cId, role, properties):
         jsonObject = json.dumps({'http_response': 503}, indent=2, default=str)
         properties.headers['http_response'] = 503
         send("ConfirmCommentCreation", jsonObject, properties)
-        raise Exception("Database is down, crashing service. Restarting, sending default error on rapid")
+        exit()
+        # raise Exception("Database is down, crashing service. Restarting, sending default error on rapid")
     except Exception as e:
         print("[-] Exception ", e.__class__, " occurred.")
         return json.dumps({'http_response': 403}, indent=2, default=str)
@@ -146,7 +150,8 @@ def request_comments_for_post(session, pId, properties):
         jsonObject = json.dumps({'list_of_comments': jsonComments}, indent=2, default=str)
         properties.headers['http_response'] = 503
         send("ConfirmCommentCreation", jsonObject, properties)
-        raise Exception("Database is down, crashing service. Restarting, sending default error on rapid")
+        exit()
+        #raise Exception("Database is down, crashing service. Restarting, sending default error on rapid")
     except Exception as e:
         print("[-] Exception ", e.__class__, " occurred.")
         properties.headers['http_response'] = 403
