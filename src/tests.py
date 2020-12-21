@@ -1,7 +1,7 @@
 import unittest
 import json
-from dbmanager import get_all_comments, request_comment, update_comment, delete_comment, request_comments_for_post, create_comment, remove_all_comments
-from receiver import session, send
+from dbmanager import request_comment, update_comment, delete_comment, request_comments_for_post, create_comment
+from receiver import send
 import time
 import pika
 
@@ -17,75 +17,75 @@ class TestComments(unittest.TestCase):
     headers=hdrs)
 
     def test_create_a_comment(self):
-        loadedJson = json.loads(create_comment(session, self.test_auth_id, self.test_post_id, "This is a test", self.properties))
+        loadedJson = json.loads(create_comment(self.test_auth_id, self.test_post_id, "This is a test", self.properties))
         httpResponse = loadedJson['http_response']
 
         # Clean database from test comment entry
-        delete_comment(session, self.test_auth_id, loadedJson['comment_id'], self.admin_role, self.properties)
+        delete_comment(self.test_auth_id, loadedJson['comment_id'], self.admin_role, self.properties)
 
         self.assertEqual(httpResponse, 200, "[-] Error creating comment")
     
     def test_request_comment_by_id(self):
-        createJson = json.loads(create_comment(session, self.test_auth_id, self.test_post_id, "This is a test", self.properties))
-        temp = request_comment(session, createJson['comment_id'], self.properties)
+        createJson = json.loads(create_comment(self.test_auth_id, self.test_post_id, "This is a test", self.properties))
+        temp = request_comment(createJson['comment_id'], self.properties)
         loadedJson = json.loads(temp)
         httpResponse = loadedJson['http_response']
 
         # Clean database from test comment entry
-        delete_comment(session, self.test_auth_id, createJson['comment_id'], self.admin_role, self.properties)
+        delete_comment(self.test_auth_id, createJson['comment_id'], self.admin_role, self.properties)
 
         self.assertEqual(httpResponse, 200, "[-] Error requesting comment")
 
     def test_request_comment_by_id_wrongId(self):
-        createJson = json.loads(create_comment(session, self.test_auth_id, self.test_post_id, "This is a test", self.properties))
-        temp = request_comment(session, self.test_auth_id, self.properties)
+        createJson = json.loads(create_comment(self.test_auth_id, self.test_post_id, "This is a test", self.properties))
+        temp = request_comment(self.test_auth_id, self.properties)
         loadedJson = json.loads(temp)
         httpResponse = loadedJson['http_response']
 
         # Clean database from test comment entry
-        delete_comment(session, self.test_auth_id, createJson['comment_id'], self.admin_role, self.properties)
+        delete_comment(self.test_auth_id, createJson['comment_id'], self.admin_role, self.properties)
 
         self.assertEqual(httpResponse, 403, "[-] Requests with wrong ID, positive HTTP response anyways.")
 
     def test_update_comment_content(self):
         #createJson = json.loads(create_comment(session, 999999, 999999, "This is a test"))
-        createJson = json.loads(create_comment(session, self.test_auth_id, self.test_post_id, "This is a test", self.properties))
-        temp = update_comment(session, createJson['comment_id'], self.test_auth_id, "Rewrote test content", self.test_role, self.properties)
+        createJson = json.loads(create_comment(self.test_auth_id, self.test_post_id, "This is a test", self.properties))
+        temp = update_comment(createJson['comment_id'], self.test_auth_id, "Rewrote test content", self.test_role, self.properties)
         loadedJson = json.loads(temp)
         httpResponse = loadedJson['http_response']
 
         # Clean database from test comment entry
-        delete_comment(session, self.test_auth_id, createJson['comment_id'], self.admin_role, self.properties)
+        delete_comment(self.test_auth_id, createJson['comment_id'], self.admin_role, self.properties)
 
         self.assertEqual(httpResponse, 200, "[-] Error changing comment")
 
     def test_update_comment_wrong_author(self):
-        createJson = json.loads(create_comment(session, self.test_auth_id, self.test_post_id, "This is a test", self.properties))
-        temp = update_comment(session, createJson['comment_id'], 42, "Rewrote test content", self.test_role, self.properties)
+        createJson = json.loads(create_comment(self.test_auth_id, self.test_post_id, "This is a test", self.properties))
+        temp = update_comment(createJson['comment_id'], 42, "Rewrote test content", self.test_role, self.properties)
         loadedJson = json.loads(temp)
         httpResponse = loadedJson['http_response']
 
         # Clean database from test comment entry
-        delete_comment(session, self.test_auth_id, createJson['comment_id'], self.admin_role, self.properties)
+        delete_comment(self.test_auth_id, createJson['comment_id'], self.admin_role, self.properties)
 
         self.assertEqual(httpResponse, 403, "[-] Changing comment with wrong author still gives positive HTTP response.")
 
     def test_delete_a_comment(self):
-        createJson = json.loads(create_comment(session, self.test_auth_id, self.test_post_id, "This is a test", self.properties))
-        temp = delete_comment(session, self.test_auth_id, createJson['comment_id'], self.test_role, self.properties)
+        createJson = json.loads(create_comment(self.test_auth_id, self.test_post_id, "This is a test", self.properties))
+        temp = delete_comment(self.test_auth_id, createJson['comment_id'], self.test_role, self.properties)
         loadedJson = json.loads(temp)
         httpResponse = loadedJson['http_response']
 
         self.assertEqual(httpResponse, 200, "[-] Error deleting comment")
 
     def test_delete_a_comment_wrong_author(self):
-        createJson = json.loads(create_comment(session, self.test_auth_id, self.test_post_id, "This is a test", self.properties))
-        temp = delete_comment(session, 42, createJson['comment_id'], self.test_role, self.properties)
+        createJson = json.loads(create_comment(self.test_auth_id, self.test_post_id, "This is a test", self.properties))
+        temp = delete_comment(42, createJson['comment_id'], self.test_role, self.properties)
         loadedJson = json.loads(temp)
         httpResponse = loadedJson['http_response']
 
         # Clean database from test comment entry
-        delete_comment(session, self.test_auth_id, createJson['comment_id'], self.admin_role, self.properties)
+        delete_comment(self.test_auth_id, createJson['comment_id'], self.admin_role, self.properties)
 
         self.assertEqual(httpResponse, 403, "[-] Deleting a comment with wrong author, still gives positive HTTP response.")
 

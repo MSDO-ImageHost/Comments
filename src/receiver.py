@@ -1,7 +1,7 @@
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from dbmanager import get_all_comments, request_comment, update_comment, delete_comment, request_comments_for_post, create_comment
+from dbmanager import request_comment, update_comment, delete_comment, request_comments_for_post, create_comment
 from config import DATABASE_CONNECTION_URI
 from models import Base, Comment
 from jose import jwt
@@ -11,15 +11,6 @@ import pika
 import sys
 import time
 from config import AMQP_PASSWORD, AMQP_USER, AMQP_URI, RABBITMQ_PORT, RABBITMQ_HOST
-
-# For the db part
-print("Connecting to database")
-engine = create_engine(DATABASE_CONNECTION_URI) #Connect to a specific database, remove echo later
-Base.metadata.create_all(bind=engine) # From the base, create all the tables in Base to the connected DB
-Session = sessionmaker(bind=engine) #Create a session factory
-session = Session() #Start a session with the engine
-print("Succesfully connected to database")
-# end of db part
 
 events = ['CreateComment', 'UpdateComment', 'DeleteComment', 'RequestComment', 'RequestCommentsForPost']
 
@@ -55,7 +46,7 @@ def receive(event, data, properties):
 
     if event == "CreateComment":
         if(jwt):
-            jsonObject = create_comment(session, user_id, data['post_id'], data['content'], properties)
+            jsonObject = create_comment(user_id, data['post_id'], data['content'], properties)
             # Get the actual http response from the action and put it into properties
             httpResponse = json.loads(jsonObject)['http_response']
             properties.headers['http_response'] = httpResponse
@@ -68,7 +59,7 @@ def receive(event, data, properties):
 
     elif event == "UpdateComment":
         if(jwt):
-            jsonObject = update_comment(session, int(data['comment_id']), user_id, data['content'], role, properties)
+            jsonObject = update_comment(int(data['comment_id']), user_id, data['content'], role, properties)
             httpResponse = json.loads(jsonObject)['http_response']
             properties.headers['http_response'] = httpResponse
             send("ConfirmCommentUpdate", jsonObject, properties)
@@ -80,7 +71,7 @@ def receive(event, data, properties):
 
     elif event == "DeleteComment":
         if(jwt):
-            jsonObject = delete_comment(session, user_id, int(data['comment_id']), role, properties)
+            jsonObject = delete_comment(user_id, int(data['comment_id']), role, properties)
             httpResponse = json.loads(jsonObject)['http_response']
             properties.headers['http_response'] = httpResponse
             send("ConfirmCommentDelete", jsonObject, properties)
@@ -91,14 +82,14 @@ def receive(event, data, properties):
             print(f'Deleted comment with {jsonObject}')
 
     elif event == "RequestComment":
-        jsonObject = request_comment(session, data['comment_id'], properties)
+        jsonObject = request_comment(data['comment_id'], properties)
         httpResponse = json.loads(jsonObject)['http_response']
         properties.headers['http_response'] = httpResponse
         send("ReturnComment", jsonObject, properties)
         print(f'Requested comment with {jsonObject}')
 
     elif event == "RequestCommentsForPost":
-        jsonObject = request_comments_for_post(session, int(data['post_id']), properties)
+        jsonObject = request_comments_for_post(int(data['post_id']), properties)
         properties.headers['http_response'] = 200
         send("ReturnCommentsForPost", jsonObject, properties)
         print(f'Requested comment for post {jsonObject}')
