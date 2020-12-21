@@ -1,6 +1,7 @@
 from datetime import datetime
 from models import Base, Comment
 import json
+import sys
 
 user_role_range = [x for x in range(10)]
 mod_role_range = [x for x in range(10,20)]
@@ -39,7 +40,8 @@ def request_comment(session, cId):
     try:
         comment = session.query(Comment).get(cId)
         return json.dumps({'comment_id': comment.id, 'author_id': comment.authorId, 'post_id': comment.postId, 'created_at': comment.postedAt, 'content': comment.content, 'http_response': 200}, indent=2, default=str)
-    except:
+    except Exception as e:
+        print("[-] Exception ", e.__class__, " occurred.")
         return json.dumps({'comment_id': cId, 'post_id': 999999, 'created_at': 999999, 'content': "Could not find comment", 'http_response': 403}, indent=2, default=str)
 '''
 @Input - A session, authorId, postId, content
@@ -48,15 +50,19 @@ and http response code.
 '''
 def create_comment(session, authorId, postId, content):
     print("Creating a comment")
-    comment = Comment()
-    comment.authorId = authorId
-    comment.postId = postId
-    comment.postedAt = datetime.now().isoformat()
-    comment.content = content
-    session.add(comment)
-    session.commit()
-    session.refresh(comment) # Needs this to refer to comment.id
-    return json.dumps({'comment_id': comment.id, 'http_response': 200, 'created_at': comment.postedAt}, indent=2, default=str)
+    try:
+        comment = Comment()
+        comment.authorId = authorId
+        comment.postId = postId
+        comment.postedAt = datetime.now().isoformat()
+        comment.content = content
+        session.add(comment)
+        session.commit()
+        session.refresh(comment) # Needs this to refer to comment.id
+        return json.dumps({'comment_id': comment.id, 'http_response': 200, 'created_at': comment.postedAt}, indent=2, default=str)
+    except Exception as e:
+        print("[-] Exception ", e.__class__, " occurred.")
+
     
 '''
 @Input - A session, id of the comment user wants to change,
@@ -76,7 +82,8 @@ def update_comment(session, cId, aId, newContent, role):
             return json.dumps({'http_response': 200, 'comment_id': comment.id, 'update_timestamp': comment.postedAt}, indent=2, default=str)
         else:
             return json.dumps({'http_response': 403, 'comment_id': comment.id, 'update_timestamp': comment.postedAt}, indent=2, default=str)
-    except:
+    except Exception as e:
+        print("[-] Exception ", e.__class__, " occurred.")
         return json.dumps({'http_response': 403, 'comment_id': cId, 'update_timestamp': 1000001}, indent=2, default=str)
         
 '''
@@ -95,7 +102,8 @@ def delete_comment(session, aId, cId, role):
             return json.dumps({'http_response': 200}, indent=2, default=str)
         else:
             return json.dumps({'http_response': 403}, indent=2, default=str)
-    except:
+    except Exception as e:
+        print("[-] Exception ", e.__class__, " occurred.")
         return json.dumps({'http_response': 403}, indent=2, default=str)
 
     
@@ -112,5 +120,6 @@ def request_comments_for_post(session, pId):
             jsonDump = json.dumps({'comment_id': comment.id, 'author_id': comment.authorId, 'post_id': comment.postId, 'created_at': comment.postedAt, 'content': comment.content}, indent=2, default=str)
             jsonComments.append(json.loads(jsonDump))
         return json.dumps({'list_of_comments': jsonComments}, indent=2, default=str)
-    except:
+    except Exception as e:
+        print("[-] Exception ", e.__class__, " occurred.")
         return json.dumps({'list_of_comments': '[]'}, indent=2, default=str)
