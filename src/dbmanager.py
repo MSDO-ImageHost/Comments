@@ -35,6 +35,7 @@ def size_of_db(session):
 ISO8601 timestamp(when it was created), and the content.
 '''
 def request_comment(session, cId):
+    print("Requesting a comment")
     try:
         comment = session.query(Comment).get(cId)
         return json.dumps({'comment_id': comment.id, 'author_id': comment.authorId, 'post_id': comment.postId, 'created_at': comment.postedAt, 'content': comment.content, 'http_response': 200}, indent=2, default=str)
@@ -46,6 +47,7 @@ def request_comment(session, cId):
 and http response code.
 '''
 def create_comment(session, authorId, postId, content):
+    print("Creating a comment")
     comment = Comment()
     comment.authorId = authorId
     comment.postId = postId
@@ -64,6 +66,7 @@ and the new content.
 ISO8601 timestamp representing when it was modified.
 '''
 def update_comment(session, cId, aId, newContent, role):
+    print("Updating a comment")
     try:
         comment = session.query(Comment).get(cId) # Might not exist
         if(aId == comment.authorId or role in mod_role_range or role in admin_role_range):
@@ -82,6 +85,7 @@ and the id of the comment
 @Output - Http response code
 '''
 def delete_comment(session, aId, cId, role):
+    print("Deleting a comment")
     #apparently it has to be done in two steps. Can't just call .delete()
     try:
         comment = session.query(Comment).get(cId) # Might not exist
@@ -100,6 +104,7 @@ def delete_comment(session, aId, cId, role):
 @Output - A list of comments in json format
 '''
 def request_comments_for_post(session, pId):
+    print("Getting comments for post")
     try:
         comments = session.query(Comment).filter(Comment.postId==pId).all()
         jsonComments = []

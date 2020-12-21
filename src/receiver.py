@@ -13,10 +13,12 @@ import time
 from config import AMQP_PASSWORD, AMQP_USER, AMQP_URI, RABBITMQ_PORT, RABBITMQ_HOST
 
 # For the db part
+print("Connecting to database")
 engine = create_engine(DATABASE_CONNECTION_URI) #Connect to a specific database, remove echo later
 Base.metadata.create_all(bind=engine) # From the base, create all the tables in Base to the connected DB
 Session = sessionmaker(bind=engine) #Create a session factory
 session = Session() #Start a session with the engine
+print("Succesfully connected to database")
 # end of db part
 
 events = ['CreateComment', 'UpdateComment', 'DeleteComment', 'RequestComment', 'RequestCommentsForPost']
@@ -57,9 +59,11 @@ def receive(event, data, properties):
             httpResponse = json.loads(jsonObject)['http_response']
             properties.headers['http_response'] = httpResponse
             send("ConfirmCommentCreation", jsonObject, properties)
+            print(f'Created comment with json: {jsonObject}')
         else:
             errorJson = json.dumps({'comment_id': 2147483645, 'http_response': 403, 'created_at': 1000001}, indent=2, default=str)
             send("ConfirmCommentCreation", errorJson, properties)
+            print(f'Created comment with json: {jsonObject}')
 
     elif event == "UpdateComment":
         if(jwt):
@@ -67,9 +71,11 @@ def receive(event, data, properties):
             httpResponse = json.loads(jsonObject)['http_response']
             properties.headers['http_response'] = httpResponse
             send("ConfirmCommentUpdate", jsonObject, properties)
+            print(f'Updated comment with {jsonObject}')
         else:
             errorJson = json.dumps({'http_response': 403, 'comment_id': data['comment_id'], 'update_timestamp': 1000001}, indent=2, default=str)
             send("ConfirmCommentUpdate", errorJson, properties)
+            print(f'Updated comment with {jsonObject}')
 
     elif event == "DeleteComment":
         if(jwt):
@@ -77,19 +83,23 @@ def receive(event, data, properties):
             httpResponse = json.loads(jsonObject)['http_response']
             properties.headers['http_response'] = httpResponse
             send("ConfirmCommentDelete", jsonObject, properties)
+            print(f'Deleted comment with {jsonObject}')
         else:
             errorJson = json.dumps({'http_response': 403}, indent=2, default=str)
             send("ConfirmCommentDelete", errorJson, properties)
+            print(f'Deleted comment with {jsonObject}')
 
     elif event == "RequestComment":
         jsonObject = request_comment(session, data['comment_id'])
         httpResponse = json.loads(jsonObject)['http_response']
         properties.headers['http_response'] = httpResponse
         send("ReturnComment", jsonObject, properties)
+        print(f'Requested comment with {jsonObject}')
 
     elif event == "RequestCommentsForPost":
         jsonObject = request_comments_for_post(session, int(data['post_id']))
         send("ReturnCommentsForPost", jsonObject, properties)
+        print(f'Requested comment for post {jsonObject}')
 
     else:
         pass # A wrong event has been given    
@@ -99,12 +109,12 @@ def callback(channel, method, properties, body):
     print("###################################")
     print(method)
     print(properties)
-    print(verify(properties.headers['jwt']))
     print(body)
     print("###################################")
     receive(event, body, properties)
 
 if __name__ == '__main__':
+    print("Trying to connect to rabbitmq")
     credentials = pika.PlainCredentials(AMQP_USER, AMQP_PASSWORD)
     connection = pika.BlockingConnection(pika.ConnectionParameters(
         host=RABBITMQ_HOST,
@@ -114,9 +124,11 @@ if __name__ == '__main__':
     channel = connection.channel()
     channel.exchange_declare(exchange='rapid', exchange_type='direct')
     channel.queue_declare('comments')
+    print("Succesfully connected to rabbitmq")
 
+    print("Bind events:")
     for event in events:
         channel.queue_bind(queue='comments', exchange='rapid', routing_key=event)
-        
+    print("Starts consuming:")
     channel.basic_consume(queue='comments', on_message_callback=callback, auto_ack=True)
     channel.start_consuming()
