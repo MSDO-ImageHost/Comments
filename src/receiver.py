@@ -1,7 +1,7 @@
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from dbmanager import get_all_comments, request_comment, update_comment, delete_comment, request_comments_for_post, create_comment
+from dbmanager import get_all_comments, request_comment, update_comment, delete_comment, request_comments_for_post, create_comment, delete_comments_for_post
 from config import DATABASE_CONNECTION_URI
 from models import Base, Comment
 from jose import jwt
@@ -21,7 +21,7 @@ session = Session() #Start a session with the engine
 print("Succesfully connected to database")
 # end of db part
 
-events = ['CreateComment', 'UpdateComment', 'DeleteComment', 'RequestComment', 'RequestCommentsForPost']
+events = ['CreateComment', 'UpdateComment', 'DeleteComment', 'RequestComment', 'RequestCommentsForPost', "ConfirmOnePostDeletion"]
 
 '''
 @Input: Event string, json data(dict)
@@ -66,7 +66,7 @@ def receive(event, data, properties):
 
     elif event == "UpdateComment":
         if(jwt):
-            jsonObject = update_comment(session, int(data['comment_id']), int(jwt['sub']), data['content'], int(jwt['sub']), properties)
+            jsonObject = update_comment(session, int(data['comment_id']), int(jwt['sub']), data['content'], int(jwt['role']), properties)
             httpResponse = json.loads(jsonObject)['http_response']
             properties.headers['http_response'] = httpResponse
             send("ConfirmCommentUpdate", jsonObject, properties)
@@ -78,7 +78,7 @@ def receive(event, data, properties):
 
     elif event == "DeleteComment":
         if(jwt):
-            jsonObject = delete_comment(session, int(jwt['sub']), int(data['comment_id']), int(jwt['sub']), properties)
+            jsonObject = delete_comment(session, int(jwt['sub']), int(data['comment_id']), int(jwt['role']), properties)
             httpResponse = json.loads(jsonObject)['http_response']
             properties.headers['http_response'] = httpResponse
             send("ConfirmCommentDelete", jsonObject, properties)
@@ -87,6 +87,11 @@ def receive(event, data, properties):
             errorJson = json.dumps({'http_response': 403}, indent=2, default=str)
             send("ConfirmCommentDelete", errorJson, properties)
             print(f'Deleted comment with {jsonObject}')
+
+    elif event == "ConfirmOnePostDeletion":
+        # No checking needed, as this has been done by the one triggering the event
+        delete_comments_for_post(session, data['post_id']) 
+        
 
     elif event == "RequestComment":
         jsonObject = request_comment(session, data['comment_id'], properties)
@@ -129,8 +134,8 @@ if __name__ == '__main__':
     channel.queue_declare('comments')
     print("Succesfully connected to rabbitmq")
 
-    print("Bind events:")
     for event in events:
+        print(f"Binding to event: {event}")
         channel.queue_bind(queue='comments', exchange='rapid', routing_key=event)
     print("Starts consuming:")
     channel.basic_consume(queue='comments', on_message_callback=callback, auto_ack=True)

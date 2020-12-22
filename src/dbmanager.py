@@ -136,7 +136,7 @@ def delete_comment(session, aId, cId, role, properties):
         print("[-] Exception ", e.__class__, " occurred.")
         return json.dumps({'http_response': 403}, indent=2, default=str)
 
-    
+
 '''
 @Input - A session, and the id of a post
 @Output - A list of comments in json format
@@ -161,3 +161,13 @@ def request_comments_for_post(session, pId, properties):
         print("[-] Exception ", e.__class__, " occurred.")
         properties.headers['http_response'] = 403
         return json.dumps({'list_of_comments': jsonComments}, indent=2, default=str)
+
+
+def delete_comments_for_post(session, pId):
+    try:
+        comments = session.query(Comment).filter(Comment.postId==pId).all()
+        for comment in comments:
+            session.delete(comment)
+            session.commit()
+    except Exception as e:
+        print("[-] Exception ", e.__class__, " occurred.")
