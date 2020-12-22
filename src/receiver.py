@@ -50,12 +50,10 @@ def receive(event, data, properties):
     data = json.loads(data)
     print(properties.headers)
     jwt = verify(properties.headers['jwt'])
-    user_id = int(jwt['sub'])
-    role = int(jwt['role'])
 
     if event == "CreateComment":
         if(jwt):
-            jsonObject = create_comment(session, user_id, data['post_id'], data['content'], properties)
+            jsonObject = create_comment(session, int(jwt['sub']), data['post_id'], data['content'], properties)
             # Get the actual http response from the action and put it into properties
             httpResponse = json.loads(jsonObject)['http_response']
             properties.headers['http_response'] = httpResponse
@@ -68,7 +66,7 @@ def receive(event, data, properties):
 
     elif event == "UpdateComment":
         if(jwt):
-            jsonObject = update_comment(session, int(data['comment_id']), user_id, data['content'], role, properties)
+            jsonObject = update_comment(session, int(data['comment_id']), int(jwt['sub']), data['content'], int(jwt['sub']), properties)
             httpResponse = json.loads(jsonObject)['http_response']
             properties.headers['http_response'] = httpResponse
             send("ConfirmCommentUpdate", jsonObject, properties)
@@ -80,7 +78,7 @@ def receive(event, data, properties):
 
     elif event == "DeleteComment":
         if(jwt):
-            jsonObject = delete_comment(session, user_id, int(data['comment_id']), role, properties)
+            jsonObject = delete_comment(session, int(jwt['sub']), int(data['comment_id']), int(jwt['sub']), properties)
             httpResponse = json.loads(jsonObject)['http_response']
             properties.headers['http_response'] = httpResponse
             send("ConfirmCommentDelete", jsonObject, properties)
