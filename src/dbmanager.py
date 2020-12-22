@@ -143,9 +143,9 @@ def delete_comment(session, aId, cId, role, properties):
 '''
 def request_comments_for_post(session, pId, properties):
     print("Getting comments for post")
+    jsonComments = []
     try:
         comments = session.query(Comment).filter(Comment.postId==pId).all()
-        jsonComments = []
         for comment in comments:
             jsonDump = json.dumps({'comment_id': comment.id, 'author_id': comment.authorId, 'post_id': comment.postId, 'created_at': comment.postedAt, 'content': comment.content}, indent=2, default=str)
             jsonComments.append(json.loads(jsonDump))
