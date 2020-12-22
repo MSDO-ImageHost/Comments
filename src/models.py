@@ -10,6 +10,6 @@ class Comment(Base):
     __tablename__ = 'comments'
     id = Column(Integer, primary_key=True)
     authorId = Column(Integer)
-    postId = Column(Integer)
+    postId = Column(String(100))
     postedAt = Column(DateTime)
     content = Column(String(100))
